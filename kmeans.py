@@ -4,6 +4,8 @@ import cv2
 from Cluster import Cluster
 import random as rand
 from datetime import datetime
+import webcolors
+from matplotlib import pyplot as plt
 
 start_time = datetime.now()
 image = cv2.imread("images/colors.jpeg")
@@ -14,7 +16,7 @@ image = cv2.resize(image, (w_resize, h_resize), interpolation=cv2.INTER_AREA)
 w, h, d = image.shape
 image_flat = np.reshape(image, (w * h, 3))
 # image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-image_flat = image_flat / 255.0
+#image_flat = image_flat / 255.0
 
 
 # X: Nxd
@@ -77,11 +79,23 @@ def kmeans(X, num_clusters):
             centers = new_centers
             loss = new_loss
 
-    return centers
+    return centers, clusters
 
 
-centers = kmeans(image_flat, 5)
-for i in range(len(centers)):
-    centers[i] *= 255
+num_clusters = 5
+centers, clusters = kmeans(image_flat, num_clusters)
+#for i in range(len(centers)):
+    #centers[i] *= 255
 print(centers)  # cluster centers in RGB values
 print(datetime.now() - start_time)  # delay
+
+for i in range(num_clusters):
+    color = webcolors.rgb_to_hex(centers[i].astype(int))
+    samples = np.array(clusters[i].samples)
+    #samples = samples * 255
+    center = np.array(centers[i])
+    #print(samples[:, 1])
+    plt.scatter(samples[:, 0], samples[:, 1], c=color)
+    plt.scatter(center[0], center[1], s=80, c='y', marker='s')
+
+plt.show()
