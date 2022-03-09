@@ -8,19 +8,31 @@ import webcolors
 from matplotlib import pyplot as plt
 
 start_time = datetime.now()
-image = cv2.imread("images/colors.jpeg")
+image = cv2.imread("images/top-white.jpg")
+image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+scale_percent = 30  # percent of original size
+width = int(image.shape[1] * scale_percent / 100)
+height = int(image.shape[0] * scale_percent / 100)
+dim = (width, height)
+# resize image
+image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+
 # print(image.shape)
-w_resize = 100
-h_resize = 100
-image = cv2.resize(image, (w_resize, h_resize), interpolation=cv2.INTER_AREA)
+# w_resize = 100
+# h_resize = 100
+# image = cv2.resize(image, (w_resize, h_resize), interpolation=cv2.INTER_AREA)
+
 w, h, d = image.shape
 image_flat = np.reshape(image, (w * h, 3))
+
+
 # image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-#image_flat = image_flat / 255.0
+# image_flat = image_flat / 255.0
 
 
 # X: Nxd
-def kmeans(X, num_clusters):
+def kmeans(X, num_clusters, num_iters=10000):
     N, d = X.shape
     # initialize the initial cluster centers
     centers = []
@@ -37,7 +49,7 @@ def kmeans(X, num_clusters):
     loss = 0
     count = 0
 
-    while True:
+    while count < num_iters:
         for cluster in clusters:
             cluster.samples = []
 
@@ -63,39 +75,43 @@ def kmeans(X, num_clusters):
         # calculate new centers
         new_centers = []
         for cluster in clusters:
-            samples = np.array(cluster.samples)
-            print(len(samples))
-            new_centers.append(np.mean(samples, axis=0))
+            curr_samples = np.array(cluster.samples)
+            print("number of samples in cluster:", len(curr_samples))
+            new_centers.append(np.mean(curr_samples, axis=0))
 
         # print(centers)
         # print(new_centers)
-        print(loss)
-        print(new_loss)
+        print("loss", loss)
+        print("new_loss", new_loss)
 
-        if loss == new_loss or count == 1:
+        if loss == new_loss:
             print("kmeans complete")
+            print("num_iters", count)
             break
         else:
             centers = new_centers
             loss = new_loss
+            count += 1
 
     return centers, clusters
 
 
-num_clusters = 5
-centers, clusters = kmeans(image_flat, num_clusters)
-#for i in range(len(centers)):
-    #centers[i] *= 255
+num_clusters = 3
+centers, clusters = kmeans(image_flat, num_clusters, num_iters=5)
+# for i in range(len(centers)):
+# centers[i] *= 255
 print(centers)  # cluster centers in RGB values
-print(datetime.now() - start_time)  # delay
+delay = datetime.now() - start_time
+print("delay", delay.total_seconds())  # delay
 
 for i in range(num_clusters):
     color = webcolors.rgb_to_hex(centers[i].astype(int))
     samples = np.array(clusters[i].samples)
-    #samples = samples * 255
+    # samples = samples * 255
     center = np.array(centers[i])
-    #print(samples[:, 1])
+    print(webcolors.rgb_to_hex(center.astype(int)))
+    # print(samples[:, 1])
     plt.scatter(samples[:, 0], samples[:, 1], c=color)
-    plt.scatter(center[0], center[1], s=80, c='y', marker='s')
+    plt.scatter(center[0], center[1], s=80, c='y', marker=r"$ {} $".format(i))
 
 plt.show()
