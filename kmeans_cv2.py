@@ -4,17 +4,15 @@ from matplotlib import pyplot as plt
 import webcolors
 from datetime import datetime
 
-img = cv2.imread("images/blue-short.jpg")
+img = cv2.imread("images/face.jpeg")
 
 
 def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor):
     height, width, depth = image.shape
     # crop
-    print(crop_factor)
     crop_factor = (100 - crop_factor) / 2
-    print(crop_factor)
-    image = image[int(height * crop_factor / 100):int(height * (1 - crop_factor / 100)),
-            int(width * crop_factor / 100):int(width * (1 - crop_factor / 100))]
+    image = image[int(height * crop_factor / 100):(height - int(height * crop_factor / 100)),
+            int(width * crop_factor / 100):(width - int(width * crop_factor / 100))]
     cv2.imwrite('output/cropped.jpg', image)
     # cv2.imshow('output/cropped.jpg', image)
     # cv2.waitKey(0)
@@ -65,7 +63,15 @@ def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor):
     # cv2.imshow("mapping", Z)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
+    plt.savefig('output/clusters.jpg')
     plt.show()
 
+    # img1 = cv2.imread("output/cropped.jpg")
+    # img2 = cv2.imread("output/mapping.jpg")
+    # img3 = cv2.imread("output/clusters.jpg")
+    #
+    # imgh = np.vstack([img1, img2, img3])
+    # cv2.imshow("all", imgh)
+    # cv2.imwrite("output/all_fig.jpg", imgh)
 
-detect_colors(img, num_clusters=4, num_iters=50, resize_factor=50, crop_factor=80)
+detect_colors(img, num_clusters=5, num_iters=50, resize_factor=50, crop_factor=50)
