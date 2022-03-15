@@ -6,7 +6,7 @@ from datetime import datetime
 from get_color_name import csv_reader, get_color_name
 
 img = cv2.imread("images/top-gray-2.jpg")
-datafile = csv_reader("color_table_rgb.csv")
+datafile = csv_reader("color_table_rgb_800.csv")
 csv_path = "color_table_rgb.csv"
 
 
@@ -75,7 +75,7 @@ def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, ty
             plt.title("Hue", fontsize=30)
 
         # print("centers", center)
-        centers_sorted = sort_color_by_percentage(centers, percentages)
+        centers_sorted, percentages_sorted = sort_color_by_percentage(centers, percentages)
         delay = datetime.now() - start_time
         print "**************** delay", delay.total_seconds()
 
@@ -84,11 +84,15 @@ def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, ty
         cv2.imwrite('output/mapping_hue.jpg', cv2.cvtColor(Z, cv2.COLOR_RGB2BGR))
         plt.savefig('output/clusters_hue.jpg')
         plt.show()
+        plt.close()
 
-        percentages.sort()
-        max_color = centers_sorted[len(centers_sorted) - 1]
+        plot = cv2.imread('output/clusters_hue.jpg')
+        mapping = cv2.imread('output/mapping_hue.jpg')
+
+        # percentages.sort()
+        max_color = centers_sorted[0]
         print get_color_name(max_color[0], max_color[1], max_color[2], csv_path)
-        return centers_sorted[len(centers_sorted) - 1], percentages[len(percentages) - 1]
+        return centers_sorted[0], percentages_sorted[0], mapping, plot
 
     elif (type == "rgb"):
         # define criteria and apply kmeans()
@@ -117,7 +121,7 @@ def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, ty
 
         # print "@@@@@@@@@ centers"
         # print center
-        center_sorted = sort_color_by_percentage(center, percentages)
+        center_sorted, percentages_sorted = sort_color_by_percentage(center, percentages)
         delay = datetime.now() - start_time
         print "**************** delay", delay.total_seconds()
 
@@ -126,11 +130,15 @@ def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, ty
         cv2.imwrite('output/mapping_rgb.jpg', cv2.cvtColor(Z, cv2.COLOR_RGB2BGR))
         plt.savefig('output/clusters_rgb.jpg')
         plt.show()
+        plt.close()
 
-        percentages.sort()
-        max_color = center_sorted[len(center_sorted) - 1]
+        plot = cv2.imread('output/clusters_rgb.jpg')
+        mapping = cv2.imread('output/mapping_rgb.jpg')
+
+        # percentages.sort()
+        max_color = center_sorted[0]
         print get_color_name(max_color[0], max_color[1], max_color[2], csv_path)
-        return center_sorted[len(center_sorted) - 1], percentages[len(percentages) - 1]
+        return center_sorted[0], percentages_sorted[0], mapping, plot
 
     else:
         print "Error: type not defined. Type must be either hue or rgb."
@@ -139,12 +147,22 @@ def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, ty
 
 # def find_color_name(rgb, table):
 def sort_color_by_percentage(colors, percentages):
-    return [x for _, x in sorted(zip(percentages, colors))]
+    while True:
+        swapped = False
+        for i in range(len(percentages)):
+            for j in range(i + 1, len(percentages)):
+                if (percentages[i] < percentages[j]):
+                    # swap
+                    percentages[i], percentages[j] = percentages[j], percentages[i]
+                    colors[i], colors[j] = colors[j], colors[i]
+                    swapped = True
+        if (not swapped): break
+    return colors, percentages
 
 
 print detect_colors(img, num_clusters=5, num_iters=50, resize_factor=10,
-                    crop_factor=100, type="hue")
+                    crop_factor=100, type="hue")[:2]
 print "========================================================"
 print "========================================================"
 print detect_colors(img, num_clusters=5, num_iters=50, resize_factor=10,
-                    crop_factor=100, type="rgb")
+                    crop_factor=100, type="rgb")[:2]
