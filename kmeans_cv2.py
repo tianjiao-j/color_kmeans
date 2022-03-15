@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 import webcolors
 from datetime import datetime
 
-img = cv2.imread("images/trousers-black.png")
+img = cv2.imread("images/top-gray-2.jpg")
 
 
 def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, type="hue"):
@@ -47,9 +47,12 @@ def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, ty
         ret, label, center = cv2.kmeans(Z_hsv, num_clusters, None, criteria, 100, cv2.KMEANS_RANDOM_CENTERS)
 
         # find centers by RGB values of cluster samples
+        percentages = []
+        centers = []
         for i in range(num_clusters):
             samples = Z[label.ravel() == i]  # RGB values
             center = np.mean(samples, axis=0)
+            centers.append(center)
             color = webcolors.rgb_to_hex(center.astype(int))
 
             # mapping the clusters
@@ -58,6 +61,7 @@ def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, ty
                     Z[j] = center
 
             percentage = len(samples) * 100 / Z.shape[0]
+            percentages.append(percentage)
             percentage_str = str(i) + "-" + str(percentage) + "%"
             print "########## cluster info", percentage_str
             print center
@@ -65,22 +69,28 @@ def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, ty
             plt.scatter(samples[:, 0], samples[:, 1], c=color, label=percentage_str, s=200)
             # plt.scatter(center[0], center[1], s=3000, c='black', marker=r"$ {} $".format(percentage_str))
             plt.legend(loc=2, prop={'size': 20})
+            plt.title("Hue", fontsize=30)
 
         # print("centers", center)
+        centers_sorted = sort_color_by_percentage(centers, percentages)
         delay = datetime.now() - start_time
         print "**************** delay", delay.total_seconds()
 
         # reconstruct image
         Z = Z.reshape((w, h, 3))
-        cv2.imwrite('output/mapping.jpg', cv2.cvtColor(Z, cv2.COLOR_RGB2BGR))
-        plt.savefig('output/clusters.jpg')
+        cv2.imwrite('output/mapping_hue.jpg', cv2.cvtColor(Z, cv2.COLOR_RGB2BGR))
+        plt.savefig('output/clusters_hue.jpg')
         plt.show()
+
+        percentages.sort()
+        return centers_sorted[len(centers_sorted) - 1], percentages[len(percentages) - 1]
 
     elif (type == "rgb"):
         # define criteria and apply kmeans()
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, num_iters, 1.0)
         ret, label, center = cv2.kmeans(Z, num_clusters, None, criteria, 100, cv2.KMEANS_RANDOM_CENTERS)
 
+        percentages = []
         for i in range(num_clusters):
             color = webcolors.rgb_to_hex(center[i].astype(int))
             samples = Z[label.ravel() == i]
@@ -91,28 +101,43 @@ def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, ty
                     Z[j] = center[i]
 
             percentage = len(samples) * 100 / Z.shape[0]
+            percentages.append(percentage)
             percentage_str = str(i) + "-" + str(percentage) + "%"
             print "########## cluster info", percentage_str
             # print(webcolors.hex_to_name(color))  # fixme: color name not found
             plt.scatter(samples[:, 0], samples[:, 1], c=color, label=percentage_str, s=200)
             # plt.scatter(center[i, 0], center[i, 1], s=3000, c='black', marker=r"$ {} $".format(percentage_str))
             plt.legend(loc=2, prop={'size': 20})
+            plt.title("RGB", fontsize=30)
 
         print "@@@@@@@@@ centers"
         print center
+        center_sorted = sort_color_by_percentage(center, percentages)
         delay = datetime.now() - start_time
         print "**************** delay", delay.total_seconds()
 
         # reconstruct image
         Z = Z.reshape((w, h, 3))
-        cv2.imwrite('output/mapping.jpg', cv2.cvtColor(Z, cv2.COLOR_RGB2BGR))
-        plt.savefig('output/clusters.jpg')
+        cv2.imwrite('output/mapping_rgb.jpg', cv2.cvtColor(Z, cv2.COLOR_RGB2BGR))
+        plt.savefig('output/clusters_rgb.jpg')
         plt.show()
+
+        percentages.sort()
+        return center_sorted[len(center_sorted) - 1], percentages[len(percentages) - 1]
 
     else:
         print "Error: type not defined. Type must be either hue or rgb."
+        exit(1)
 
 
 # def find_color_name(rgb, table):
+def sort_color_by_percentage(colors, percentages):
+    return [x for _, x in sorted(zip(percentages, colors))]
 
-detect_colors(img, num_clusters=5, num_iters=50, resize_factor=10, crop_factor=100, type="rgb")
+
+print detect_colors(img, num_clusters=5, num_iters=50, resize_factor=10,
+                    crop_factor=100, type="hue")
+print "========================================================"
+print "========================================================"
+print detect_colors(img, num_clusters=5, num_iters=50, resize_factor=10,
+                    crop_factor=100, type="rgb")
