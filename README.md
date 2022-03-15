@@ -1,14 +1,14 @@
 # color_kmeans
 
 ### Usage  
-To test the funtion, run  
+**To test the funtion, run**  
 ```
-python kmean_cv2.py
+python kmeans_cv2.py
 ```
-using kmeans method in cv2  
+it uses kmeans method in cv2  
 
 
-To use the function in your code:  
+**To use the function in your code:**    
 ```python
 from kmeans_cv2 import detect_colors
 image = cv2.imread(path_to_image)
@@ -26,6 +26,6 @@ image = cv2.imread(path_to_image)
 detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, type="hue")
 ```
 
-**Reference:**
+**Reference:**  
 https://github.com/jacques-saraydaryan/ros_color_detection  
 https://github.com/RoboBreizh-RoboCup-Home/perception-pepper/tree/main/age_color_gender_face_detection
