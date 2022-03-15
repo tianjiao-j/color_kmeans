@@ -3,8 +3,11 @@ import cv2
 from matplotlib import pyplot as plt
 import webcolors
 from datetime import datetime
+from get_color_name import csv_reader, get_color_name
 
 img = cv2.imread("images/top-gray-2.jpg")
+datafile = csv_reader("color_table_rgb.csv")
+csv_path = "color_table_rgb.csv"
 
 
 def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, type="hue"):
@@ -83,6 +86,8 @@ def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, ty
         plt.show()
 
         percentages.sort()
+        max_color = centers_sorted[len(centers_sorted) - 1]
+        print get_color_name(max_color[0], max_color[1], max_color[2], csv_path)
         return centers_sorted[len(centers_sorted) - 1], percentages[len(percentages) - 1]
 
     elif (type == "rgb"):
@@ -123,6 +128,8 @@ def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, ty
         plt.show()
 
         percentages.sort()
+        max_color = center_sorted[len(center_sorted) - 1]
+        print get_color_name(max_color[0], max_color[1], max_color[2], csv_path)
         return center_sorted[len(center_sorted) - 1], percentages[len(percentages) - 1]
 
     else:
