@@ -12,13 +12,16 @@ it uses kmeans method in cv2
 ```python
 from kmeans_cv2 import detect_colors
 image = cv2.imread(path_to_image)
+
 ## params:
 # num_iters: max. number of iterations allowed for kmeans clustering
 # resize_factor: 100 = full resolution (not recommended, will be slow)
 # crop_factor: 100 = full image
 # type: default - clustering based on hue value of pixels, type="rgb" - clustering based on RGB values
+
 ## returns:
 # RGB values of main cluster center, percentage of the main cluster
+
 ## other outputs:
 # prints color name of main cluster
 # output transformed image after pixel mapping
