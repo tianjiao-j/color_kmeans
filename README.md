@@ -24,6 +24,7 @@ image = cv2.imread(path_to_image)
 
 ## other outputs:
 # prints color name of main cluster
+# prints delay in seconds
 # output transformed image after pixel mapping
 # output scatterplot of clustered pixels
 detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, type="hue")
