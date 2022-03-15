@@ -66,8 +66,8 @@ def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, ty
             percentage = len(samples) * 100 / Z.shape[0]
             percentages.append(percentage)
             percentage_str = str(i) + "-" + str(percentage) + "%"
-            print "########## cluster info", percentage_str
-            print center
+            # print "########## cluster info", percentage_str
+            # print center
             # print(webcolors.hex_to_name(color))  # fixme: color name not found
             plt.scatter(samples[:, 0], samples[:, 1], c=color, label=percentage_str, s=200)
             # plt.scatter(center[0], center[1], s=3000, c='black', marker=r"$ {} $".format(percentage_str))
@@ -108,15 +108,15 @@ def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, ty
             percentage = len(samples) * 100 / Z.shape[0]
             percentages.append(percentage)
             percentage_str = str(i) + "-" + str(percentage) + "%"
-            print "########## cluster info", percentage_str
+            # print "########## cluster info", percentage_str
             # print(webcolors.hex_to_name(color))  # fixme: color name not found
             plt.scatter(samples[:, 0], samples[:, 1], c=color, label=percentage_str, s=200)
             # plt.scatter(center[i, 0], center[i, 1], s=3000, c='black', marker=r"$ {} $".format(percentage_str))
             plt.legend(loc=2, prop={'size': 20})
             plt.title("RGB", fontsize=30)
 
-        print "@@@@@@@@@ centers"
-        print center
+        # print "@@@@@@@@@ centers"
+        # print center
         center_sorted = sort_color_by_percentage(center, percentages)
         delay = datetime.now() - start_time
         print "**************** delay", delay.total_seconds()
