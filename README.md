@@ -30,6 +30,8 @@ image = cv2.imread(path_to_image)
 detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, type="hue")
 ```
 
+**Note: it requires the package webcolors and matplotlib which are not avaiable in pepper for visualization purposes, but these packages are not required for the core function.**  
+
 **Reference:**  
 https://github.com/jacques-saraydaryan/ros_color_detection  
 https://github.com/RoboBreizh-RoboCup-Home/perception-pepper/tree/main/age_color_gender_face_detection
