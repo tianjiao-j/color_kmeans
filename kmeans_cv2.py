@@ -5,12 +5,12 @@ import webcolors
 from datetime import datetime
 from get_color_name import csv_reader, get_color_name
 
-img = cv2.imread("images/top-gray-2.jpg")
+img = cv2.imread("images/person1.jpg")
 datafile = csv_reader("color_table_rgb_800.csv")
 csv_path = "color_table_rgb.csv"
 
 
-def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, type="hue"):
+def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, type="rgb"):
     height, width, depth = image.shape
     # crop
     crop_factor = (100 - crop_factor) / 2
@@ -83,7 +83,7 @@ def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, ty
         Z = Z.reshape((w, h, 3))
         cv2.imwrite('output/mapping_hue.jpg', cv2.cvtColor(Z, cv2.COLOR_RGB2BGR))
         plt.savefig('output/clusters_hue.jpg')
-        plt.show()
+        # plt.show()
         plt.close()
 
         plot = cv2.imread('output/clusters_hue.jpg')
@@ -114,7 +114,7 @@ def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, ty
             percentage_str = str(i) + "-" + str(percentage) + "%"
             # print "########## cluster info", percentage_str
             # print(webcolors.hex_to_name(color))  # fixme: color name not found
-            plt.scatter(samples[:, 0], samples[:, 1], c=color, label=percentage_str, s=200)
+            plt.scatter(samples[:, 0], samples[:, 1], c=color, label=percentage_str, s=5)
             # plt.scatter(center[i, 0], center[i, 1], s=3000, c='black', marker=r"$ {} $".format(percentage_str))
             plt.legend(loc=2, prop={'size': 20})
             plt.title("RGB", fontsize=30)
@@ -127,9 +127,11 @@ def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, ty
 
         # reconstruct image
         Z = Z.reshape((w, h, 3))
-        cv2.imwrite('output/mapping_rgb.jpg', cv2.cvtColor(Z, cv2.COLOR_RGB2BGR))
+        # filename = 'output/mapping_rgb_' + str(num_clusters) + '.jpg'
+        filename = 'output/mapping_rgb.jpg'
+        cv2.imwrite(filename, cv2.cvtColor(Z, cv2.COLOR_RGB2BGR))
         plt.savefig('output/clusters_rgb.jpg')
-        plt.show()
+        # plt.show()
         plt.close()
 
         plot = cv2.imread('output/clusters_rgb.jpg')
@@ -159,10 +161,10 @@ def sort_color_by_percentage(colors, percentages):
         if (not swapped): break
     return colors, percentages
 
-
-print detect_colors(img, num_clusters=5, num_iters=50, resize_factor=10,
-                    crop_factor=100, type="hue")[:2]
-print "========================================================"
-print "========================================================"
-print detect_colors(img, num_clusters=5, num_iters=50, resize_factor=10,
-                    crop_factor=100, type="rgb")[:2]
+# print detect_colors(img, num_clusters=20, num_iters=50, resize_factor=100,
+#                     crop_factor=100, type="hue")[:2]
+# print "========================================================"
+# print "========================================================"
+# for num_clusters in [3, 5, 10, 20]:
+#     print detect_colors(img, num_clusters=num_clusters, num_iters=50, resize_factor=100,
+#                         crop_factor=100, type="rgb")[:2]
