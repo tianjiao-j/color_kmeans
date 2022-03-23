@@ -5,8 +5,8 @@ import webcolors
 from datetime import datetime
 from get_color_name import csv_reader, get_color_name
 
-img = cv2.imread("images/person1.jpg")
-datafile = csv_reader("color_table_rgb_800.csv")
+# img = cv2.imread("images/person2.jpg")
+datafile = csv_reader("color_table_rgb_800.csv", has_header=True)
 csv_path = "color_table_rgb.csv"
 
 
@@ -127,15 +127,19 @@ def detect_colors(image, num_clusters, num_iters, resize_factor, crop_factor, ty
 
         # reconstruct image
         Z = Z.reshape((w, h, 3))
-        # filename = 'output/mapping_rgb_' + str(num_clusters) + '.jpg'
-        filename = 'output/mapping_rgb.jpg'
+
+        # TODO
+        filename = 'output/mapping_rgb_' + str(num_clusters) + '.jpg'
+        # filename = 'output/mapping_rgb.jpg'
         cv2.imwrite(filename, cv2.cvtColor(Z, cv2.COLOR_RGB2BGR))
+        mapping = cv2.cvtColor(Z, cv2.COLOR_RGB2BGR)
+        mapping = np.uint8(mapping)
         plt.savefig('output/clusters_rgb.jpg')
         # plt.show()
         plt.close()
 
         plot = cv2.imread('output/clusters_rgb.jpg')
-        mapping = cv2.imread('output/mapping_rgb.jpg')
+        # mapping = cv2.imread('output/mapping_rgb.jpg')
 
         # percentages.sort()
         max_color = center_sorted[0]
@@ -165,6 +169,7 @@ def sort_color_by_percentage(colors, percentages):
 #                     crop_factor=100, type="hue")[:2]
 # print "========================================================"
 # print "========================================================"
+# TODO
 # for num_clusters in [3, 5, 10, 20]:
 #     print detect_colors(img, num_clusters=num_clusters, num_iters=50, resize_factor=100,
 #                         crop_factor=100, type="rgb")[:2]

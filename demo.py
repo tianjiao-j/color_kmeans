@@ -10,6 +10,8 @@ def make_demo(resize_factor):
     # Create a VideoCapture object
     cap = cv2.VideoCapture(0)
 
+    img = cv2.imread('images/top-white.jpg')
+
     # Check if camera opened successfully
     if (cap.isOpened() == False):
         print("Unable to read camera feed")
@@ -36,13 +38,43 @@ def make_demo(resize_factor):
             colors_rgb, percentages, mapping, plot = detect_colors(frame, num_clusters=5, num_iters=50,
                                                                    resize_factor=resize_factor * 100,
                                                                    crop_factor=100, type="rgb")
-            # vis = np.concatenate((mapping, plot), axis=1)
-            print mapping.shape, plot.shape
-            out1.write(mapping)
-            out2.write(plot)
+            print('raw ', mapping.shape, plot.shape)
+            mappingImages = [mapping, plot, img]
+            max_height = 0
+            for i in range(len(mappingImages)):
+                mapping = mappingImages[i]
+                if (mapping.shape[0] > max_height):
+                    max_height = mapping.shape[0]
+            max_height += 10
+            for i in range(len(mappingImages)):
+                print(i)
+                mapping = mappingImages[i]
+                top = int((max_height - mapping.shape[0]) / 2)
+                bottom = max_height - mapping.shape[0] - top
+                if (top < 0): top = 0
+                if (bottom < 0): bottom = 0
+                print('top, bottom ', top, bottom)
+                mapping = cv2.copyMakeBorder(mapping, top, bottom, 5, 5, cv2.BORDER_CONSTANT)
+                if (i == 0):
+                    mapping_concat = mapping
+                else:
+                    print('padded ', mapping_concat.shape, mapping.shape)
+                    mapping_concat = np.concatenate((mapping_concat, mapping), axis=1)
+
+            # print mapping.shape, plot.shape
+            top = int((plot.shape[0] - mapping.shape[0]) / 2)
+            bottom = plot.shape[0] - mapping.shape[0] - top
+            left = int((plot.shape[1] - mapping.shape[1]) / 2)
+            right = plot.shape[1] - mapping.shape[1] - left
+            # mapping = cv2.resize(mapping, (plot.shape[1], plot.shape[0]), interpolation=cv2.INTER_AREA)
+            #mapping = cv2.copyMakeBorder(mapping, top, bottom, left, right, cv2.BORDER_CONSTANT)
+            # out1.write(mapping)
+            # out2.write(plot)
             # Display the resulting frame
+
             cv2.imshow('mapping_rgb', mapping)
             cv2.imshow('clusters', plot)
+            cv2.imshow('concat', mapping_concat)
             if (int(date_time.split("_")[5]) % 10 == 0):
                 if (not os.path.exists('test/')):
                     os.mkdir('test/')
