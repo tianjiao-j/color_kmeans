@@ -38,6 +38,9 @@ def make_demo(resize_factor):
             colors_rgb, percentages, mapping, plot = detect_colors(frame, num_clusters=5, num_iters=50,
                                                                    resize_factor=resize_factor * 100,
                                                                    crop_factor=100, type="rgb")
+
+            out1.write(mapping)
+            out2.write(plot)
             print('raw ', mapping.shape, plot.shape)
             mappingImages = [mapping, plot, img]
             max_height = 0
